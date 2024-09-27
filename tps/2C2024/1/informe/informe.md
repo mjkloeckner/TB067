@@ -12,9 +12,9 @@ eficiente, implementado de extremo a extremo y con patron publisher-subscriber
 Este protocolo está diseñado principalmente para dispositivos en locaciones
 remotas con recursos y/o ancho de banda limitado, tal como sistemas embebidos.
 
-El protocolo MQTT se ubica en el nivel de aplicación del modelo TCP/IP, y
-requiere de un protocolo del nivel de red que sea ordenado, seguro y sin perdida
-de datos, tal como el protocolo TCP.
+El protocolo MQTT se ubica en el nivel de aplicación del modelo TCP/IP por lo
+que requiere de un protocolo de transporte subyacente; en particular uno que sea
+ordenado, seguro y sin perdida de datos, tal como el protocolo TCP.
 
 ### Seguridad
 
@@ -34,7 +34,7 @@ OASIS (Organization for the Advancement of Structured Information Standards)
 
 ### Referencias
 
-[MQTT: The Standard for IoT Messaging](https://mqtt.org/)
+[MQTT: The Standard for IoT Messaging](https://mqtt.org/)  
 [¿Qué es MQTT?](https://aws.amazon.com/es/what-is/mqtt/)
 
 ## Uso Práctico
