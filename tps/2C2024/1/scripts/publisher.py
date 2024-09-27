@@ -5,7 +5,7 @@ import time
 broker_address = "broker.hivemq.com"
 #broker_address = "mqtt-dashboard.com"
 
-topic = "tp1/kloeckner"
+topic = "tp1/klockner"
 min_size = 50  # Tamaño mínimo del fragmento
 max_size = 70  # Tamaño máximo del fragmento
 file_to_publish = 'input.txt'
