@@ -1,7 +1,8 @@
-# Trabajo Práctico: Nivel de Transporte y Nivel de Red del Modelo TCP/IP
+# Nivel de Transporte y de Red del Modelo TCP/IP
 
 Redes de Comunicaciones (TB067) - 2C2024 - FIUBA  
-Martin Klöckner (123456) - [mklockner@fi.uba.ar](mailto:mklockner@fi.uba.ar)
+Martin Klöckner (123456) - [mklockner@fi.uba.ar](mailto:mklockner@fi.uba.ar)  
+Matteo Aguilar Cafferata (123456) - [meaguilar@fi.uba.ar](meaguilar@fi.uba.ar)
 
 ## El protocolo MQTT
 
