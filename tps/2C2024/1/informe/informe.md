@@ -36,6 +36,7 @@ OASIS (Organization for the Advancement of Structured Information Standards)
 
 [MQTT: The Standard for IoT Messaging](https://mqtt.org/)  
 [¿Qué es MQTT?](https://aws.amazon.com/es/what-is/mqtt/)
+[A expandir](https://www.paessler.com/es/it-explained/mqtt).
 
 ## Uso Práctico
 
