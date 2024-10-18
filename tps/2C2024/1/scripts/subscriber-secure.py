@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 # Configuración
 broker = "broker.hivemq.com"
 #broker = "mqtt-dashboard.com"
-topic = "tp1/aguilar_klockner"
+topic = "tp1/aguilar_klockner"     # <<<<<<<<<<====== Completar con el nombre del grupo
 output_file = 'output.txt'
 received_fragments = {}
 last_fragment = False
@@ -14,18 +14,29 @@ def on_subscribe(self, mqttc, obj, mid, granted_qos):
 def on_message(client, userdata, msg):
     global last_fragment
     
+    
     # Decodificar mensaje: número de fragmento, tamaño, bandera de último fragmento, y contenido
     payload = msg.payload.decode('utf-8')
     fragment_info, fragment = payload.rsplit('|', 1)
     fragment_number, fragment_size, is_last = map(int, fragment_info.split('|')[:3])
+
+   
+
+    if fragment_number == -1: #En caso de recibir error de transmision borra todo y continua recibiendo
+        print(f"Error en la recepcion. Reiniciando secuencia")
+        received_fragments.clear()
+  
+    else: 
+        if fragment_number != 100: #Guarda cada dato recibido menos el mensaje de exito
+            received_fragments[fragment_number] = (fragment_size, fragment)
+            print(f"Fragmento recibido {fragment_number} (size: {fragment_size})")  
     
-    received_fragments[fragment_number] = (fragment_size, fragment)
-    print(f"Fragmento recibido {fragment_number} (size: {fragment_size})")    
     if is_last == 1:
         last_fragment = True
     
     # Reensamblar si es el último fragmento
     if last_fragment:
+        print(f"Exito en la recepcion. Finalizando secuencia")
         reassemble_file(output_file)
         quit()
 

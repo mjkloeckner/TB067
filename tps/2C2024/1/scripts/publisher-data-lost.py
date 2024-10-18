@@ -1,15 +1,15 @@
 import paho.mqtt.client as mqtt
 import random
 import time 
-
 # Configuración
 broker_address = "broker.hivemq.com"
-# broker_address = "mqtt-dashboard.com"
+#broker_address = "mqtt-dashboard.com"
 
-topic = "tp1/aguilar_klockner"
+topic = "tp1/aguilar_klockner"     # <<<<<<<<<<====== Completar con el nombre del grupo
 min_size = 50  # Tamaño mínimo del fragmento
 max_size = 70  # Tamaño máximo del fragmento
 file_to_publish = 'input.txt'
+
 
 def on_connect(client, userdata, flags, rc):
     # Al conectarse, configuramos la opción TCP_NODELAY
@@ -23,22 +23,31 @@ def publish_file(client, filename, min_size, max_size):
     with open(filename, 'r') as file:
         content = file.read()
 
+	
     index = 0
     fragment_number = 0
+
+    #Toma la medida total de la informacion y la envia como paquete 0
+    lenght = len(content)
+    payload = f'{fragment_number}|{4}|{0}|{lenght}'
+    client.publish(topic, payload, qos=2, retain=False)
+    print(f"Fragmento publicado {fragment_number} (size: {4})")
+    fragment_number += 1
+
     while index < len(content):
         fragment_size = random.randint(min_size, max_size)
         fragment = content[index:index+fragment_size]
-
+        
         # Metadatos: número de fragmento, tamaño, y bandera de último fragmento
         is_last = 1 if index + fragment_size >= len(content) else 0
-        payload = f'{fragment_number}|{fragment_size}|{is_last}|{fragment}'        
+        payload = f'{fragment_number}|{fragment_size}|{is_last}|{fragment}'
 
-        if fragment_number != 6:
+        if fragment_number != 6: #Pierde un paquete aproposito
             client.publish(topic, payload, qos=2, retain=False)
             print(f"Fragmento publicado {fragment_number} (size: {fragment_size})")
 
-        fragment_number += 1
         index += fragment_size
+        fragment_number += 1
         time.sleep(1)
 
 # Configuración del cliente MQTT
