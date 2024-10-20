@@ -24,7 +24,8 @@
 \let\oldtexttt\texttt
 
 \renewcommand{\texttt}[1]{
-	\colorbox{bgcolor}{\oldtexttt{#1}}
+	\setlength\fboxsep{2pt}
+	\kern-0.60em\colorbox{bgcolor}{\oldtexttt{#1}}\kern-0.25pt
 }
 
 % change boldfont bold to extrabold
