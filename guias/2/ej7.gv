@@ -1,21 +1,21 @@
 digraph {
     node [shape=record]
     rankdir=TD;
-    ranksep=0.15;
+    ranksep=0;
     newrank=true;
-    nodesep=1.5;
+    nodesep=1.25;
     compound=true;
     subgraph cluster_A {
         label="host A"
-        style="dashed"
-        node [width=2.00, fontsize=11 ];
+        style="solid"
+        node [width=2.50, fontsize=10 ];
         0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 [color=none];
         10 -> 11 -> 12 -> 13 -> 14 [color=none];
     }
     subgraph cluster_B {
         label="host B"
-        style="dashed"
-        node [width=2.00, fontsize=11 ];
+        style="solid"
+        node [width=2.50, fontsize=11 ];
 
         50 -> 51 -> 52 -> 53 -> 54 -> 55 -> 56 -> 57 -> 58 -> 59 -> 60 [color=none];
         60-> 61 -> 62 -> 63 -> 64 [color=none];
@@ -36,8 +36,8 @@ digraph {
     { rank=same; 12; 62; }
     { rank=same; 13; 63; }
 
-    1, 4, 7, 9, 11, 12, 14 [color=none, fontcolor=none];
-    50, 52, 53, 55, 58, 60, 63, 64 [color=none, fontcolor=none];
+    1, 4, 7, 9, 11, 12, 14 [color=black, fontcolor=none, style=dotted];
+    50, 52, 53, 55, 58, 60, 63, 64 [color=black, fontcolor=none, style=dotted ];
 
      0 -> 51 [lhead=cluster_B]
     51 ->  2 [lhead=cluster_A]
