@@ -10,7 +10,7 @@ digraph {
         style="solid"
         node [width=2.50, fontsize=10 ];
         0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 [color=none];
-        10 -> 11 -> 12 -> 13 -> 14 [color=none];
+        10 -> 11 -> 12 -> 13 [color=none];
     }
     subgraph cluster_B {
         label="host B"
@@ -18,7 +18,7 @@ digraph {
         node [width=2.50, fontsize=11 ];
 
         50 -> 51 -> 52 -> 53 -> 54 -> 55 -> 56 -> 57 -> 58 -> 59 -> 60 [color=none];
-        60-> 61 -> 62 -> 63 -> 64 [color=none];
+        60-> 61 -> 62 -> 63 [color=none];
     }
 
     { rank=same;  0; 50; }
@@ -36,40 +36,44 @@ digraph {
     { rank=same; 12; 62; }
     { rank=same; 13; 63; }
 
-    1, 4, 7, 9, 11, 12, 14 [color=black, fontcolor=none, style=dotted];
-    50, 52, 53, 55, 58, 60, 63, 64 [color=black, fontcolor=none, style=dotted ];
+    1, 5, 8, 10, 11, 13 [color=black, fontcolor=none, style=dotted];
+    50, 52, 53, 54, 56, 57, 59, 62, 63 [color=black, fontcolor=none, style=dotted ];
 
      0 -> 51 [lhead=cluster_B]
     51 ->  2 [lhead=cluster_A]
      2 -> 53 [lhead=cluster_B]
      3 -> 54 [lhead=cluster_B]
-    54 ->  5 [lhead=cluster_A]
-     5 -> 56 [lhead=cluster_B]
-    56 ->  7 [lhead=cluster_A]
+     4 -> 55 [lhead=cluster_B]
+    55 ->  6 [lhead=cluster_A]
      6 -> 57 [lhead=cluster_B]
-    57 ->  8 [lhead=cluster_A]
-     8 -> 59 [lhead=cluster_B]
-    10 -> 61 [lhead=cluster_B]
+    58 ->  9 [lhead=cluster_A]
+     7 -> 58 [lhead=cluster_B]
+     9 -> 60 [lhead=cluster_B]
+    60 -> 11 [lhead=cluster_A]
     61 -> 12 [lhead=cluster_A]
-    62 -> 13 [lhead=cluster_A]
-    13 -> 64 [lhead=cluster_B]
+    12 -> 63 [lhead=cluster_B]
 
-    0 [ label="{SYN|S=1000}" ]
-    2 [ label="{ACK|S=1001, A=5001}" ]
-    3 [ label="{ACK|S=1001, A=5001, Len=200}" ]
-    5 [ label="{ACK|S=1201, A=5001, Len=200}" ]
-    6 [ label="{ACK|S=1401, A=5001, Len=200}" ]
-    8 [ label="{ACK|S=1601, A=5001, Len=200}" ]
-    10 [ label="{FIN, ACK|S=1601, A=5001}" ]
-    13 [ label="{ACK|S=1601, A=5001}" ]
+     0 [ label="{SYN|S=1000}" ]
+     2 [ label="{ACK|S=1001, A=5001}" ]
+     3 [ label="{ACK|S=1001, A=5001, Len=200}" ]
+     4 [ label="{ACK|S=1201, A=5001, Len=200}" ]
+     6 [ label="{ACK|S=1401, A=5001, Len=200}" ]
+     7 [ label="{ACK|S=1601, A=5001, Len=200}" ]
+     9 [ label="{FIN, ACK|S=1601, A=5001}" ]
+    12 [ label="{ACK|S=1601, A=5001}" ]
 
     51 [ label="{SYN, ACK|S=5001, A=1001, W=800}" ]
-    54 [ label="{ACK|S=5001, A=1201, W=800}" ]
-    56 [ label="{ACK|S=5001, A=1401, W=800}" ]
-    57 [ label="{ACK|S=5001, A=1601, W=800}" ]
-    59 [ label="{ACK|S=5001, A=1801, W=800}" ]
-    61 [ label="{ACK|S=5001, A=1801, W=800}" ]
+    55 [ label="{ACK|S=5001, A=1401, W=800}" ]
+    58 [ label="{ACK|S=5001, A=1801, W=800}" ]
+    60 [ label="{ACK|S=5001, A=1801, W=800}" ]
 
-    11 [ label="{FIN|S=1601, A=5001}" ]
-    62 [ label="{FIN|S=1601, A=5001}" ]
+    // 9 [ label="{FIN|S=1601, A=5001}" ]
+    61 [ label="{FIN, ACK|S=1601, A=5001}" ]
+/*
+     5 -> 56 [lhead=cluster_B]
+    56 ->  7 [lhead=cluster_A]
+
+    54 [ label="{ACK|S=5001, A=1201, W=800}" ]
+    59 [ label="{ACK|S=5001, A=1801, W=800}" ]
+*/
 }
