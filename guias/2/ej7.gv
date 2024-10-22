@@ -1,0 +1,75 @@
+digraph {
+    node [shape=record]
+    rankdir=TD;
+    ranksep=0.15;
+    newrank=true;
+    nodesep=1.5;
+    compound=true;
+    subgraph cluster_A {
+        label="host A"
+        style="dashed"
+        node [width=2.00, fontsize=11 ];
+        0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 [color=none];
+        10 -> 11 -> 12 -> 13 -> 14 [color=none];
+    }
+    subgraph cluster_B {
+        label="host B"
+        style="dashed"
+        node [width=2.00, fontsize=11 ];
+
+        50 -> 51 -> 52 -> 53 -> 54 -> 55 -> 56 -> 57 -> 58 -> 59 -> 60 [color=none];
+        60-> 61 -> 62 -> 63 -> 64 [color=none];
+    }
+
+    { rank=same;  0; 50; }
+    { rank=same;  1; 51; }
+    { rank=same;  2; 52; }
+    { rank=same;  3; 53; }
+    { rank=same;  4; 54; }
+    { rank=same;  5; 55; }
+    { rank=same;  6; 56; }
+    { rank=same;  7; 57; }
+    { rank=same;  8; 58; }
+    { rank=same;  9; 59; }
+    { rank=same; 10; 60; }
+    { rank=same; 11; 61; }
+    { rank=same; 12; 62; }
+    { rank=same; 13; 63; }
+
+    1, 4, 7, 9, 11, 12, 14 [color=none, fontcolor=none];
+    50, 52, 53, 55, 58, 60, 63, 64 [color=none, fontcolor=none];
+
+     0 -> 51 [lhead=cluster_B]
+    51 ->  2 [lhead=cluster_A]
+     2 -> 53 [lhead=cluster_B]
+     3 -> 54 [lhead=cluster_B]
+    54 ->  5 [lhead=cluster_A]
+     5 -> 56 [lhead=cluster_B]
+    56 ->  7 [lhead=cluster_A]
+     6 -> 57 [lhead=cluster_B]
+    57 ->  8 [lhead=cluster_A]
+     8 -> 59 [lhead=cluster_B]
+    10 -> 61 [lhead=cluster_B]
+    61 -> 12 [lhead=cluster_A]
+    62 -> 13 [lhead=cluster_A]
+    13 -> 64 [lhead=cluster_B]
+
+    0 [ label="{SYN|S=1000}" ]
+    2 [ label="{ACK|S=1001, A=5001}" ]
+    3 [ label="{ACK|S=1001, A=5001, Len=200}" ]
+    5 [ label="{ACK|S=1201, A=5001, Len=200}" ]
+    6 [ label="{ACK|S=1401, A=5001, Len=200}" ]
+    8 [ label="{ACK|S=1601, A=5001, Len=200}" ]
+    10 [ label="{FIN, ACK|S=1601, A=5001}" ]
+    13 [ label="{ACK|S=1601, A=5001}" ]
+
+    51 [ label="{SYN, ACK|S=5001, A=1001, W=800}" ]
+    54 [ label="{ACK|S=5001, A=1201, W=800}" ]
+    56 [ label="{ACK|S=5001, A=1401, W=800}" ]
+    57 [ label="{ACK|S=5001, A=1601, W=800}" ]
+    59 [ label="{ACK|S=5001, A=1801, W=800}" ]
+    61 [ label="{ACK|S=5001, A=1801, W=800}" ]
+
+    11 [ label="{FIN|S=1601, A=5001}" ]
+    62 [ label="{FIN|S=1601, A=5001}" ]
+}
