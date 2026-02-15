@@ -1,0 +1,293 @@
+% \documentclass[14pt]{extarticle}
+
+% page setup
+\usepackage[a4paper,
+			top=3.00cm,
+			bottom=2.00cm,
+			left=2.5cm,
+			right=2.5cm,
+			bmargin=3.25cm]{geometry}
+
+\usepackage{titlesec}
+\usepackage{fontspec}
+
+% right pointing hand
+\usepackage{utfsym}
+
+% make pictures caption font bold and small
+\usepackage[font={normalsize}]{caption}
+
+% inline code (backticks in md)
+\linespread{1.10}
+% \definecolor{bgcolor}{HTML}{e0e0e0}
+\definecolor{bgcolor}{HTML}{f5f5f5}
+\let\oldtexttt\texttt
+
+\renewcommand{\texttt}[1]{
+	\setlength\fboxsep{2pt}
+	\kern-0.25em\colorbox{bgcolor}{\oldtexttt{#1}}\kern-0.25pt
+}
+
+% change boldfont bold to extrabold
+% \setmainfont[
+%  BoldFont={Inter-ExtraBold}
+% ]{Inter}
+
+% change regular font to light font
+% \setmainfont{Inter light}
+% \setmainfont{Inter}
+% \setmainfont{Nimbus Sans}
+\setmainfont{Nimbus Sans L}
+
+\newfontfamily\titlefont{Inter}[
+UprightFont     =   *-Regular,
+BoldFont        =   *-ExtraBold,
+Scale           =   1.0
+]
+
+\newfontfamily\sectionsfont{Inter}[
+UprightFont     =   *-Regular,
+BoldFont        =   *-Bold,
+]
+
+\setmathfont{Fira Math}
+
+\usepackage{xcolor}
+\definecolor{ugrey}{HTML}{131313}
+
+\titleformat{\section}
+{\color{ugrey}\titlefont\LARGE\bfseries\raggedright}
+{\color{ugrey}}
+{0em}
+{}
+
+\titleformat{\subsection}
+{\color{ugrey}\sectionsfont\Large\bfseries\raggedright}
+{\color{ugrey}}
+{0em}
+{}
+
+\titleformat{\subsubsection}
+{\color{ugrey}\sectionsfont\large\bfseries\raggedright}
+{\color{ugrey}}
+{0em}
+{}
+
+\titleformat{\paragraph}
+{\color{ugrey}\sectionsfont\fontsize{11}{13}\selectfont\bfseries\raggedright}
+{\color{ugrey}\theparagraph}
+{0em}
+{}
+
+\titleformat{\subparagraph}
+{\color{ugrey}\normalfont\bfseries\raggedright}
+{\color{ugrey}\theparagraph}
+{0pt}
+{}
+
+% spacing: how to read {12pt plus 4pt minus 2pt}
+%       12pt is what we would like the spacing to be
+%       plus 4pt means that TeX can stretch it by at most 4pt
+%       minus 2pt means that TeX can shrink it by at most 2pt
+%
+% \titlespacing{command}{left spacing}{before spacing}{after spacing}[right]
+
+\titlespacing*{\section}
+{0pt}{2ex plus 1ex minus .2ex}{1.75ex plus .2ex}
+
+\titlespacing*{\subsection}
+{0pt}{1.75ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titlespacing*{\subsubsection}
+{0pt}{1.5ex plus 1ex minus .2ex}{1.25ex plus .2ex}
+
+\titlespacing*{\paragraph}
+{0pt}{1.5ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+
+\titlespacing*{\subparagraph}
+{0pt}{1.25ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+
+% spacing between formulas and text
+\setlength{\abovedisplayskip}{5pt}
+\setlength{\belowdisplayskip}{2pt}
+
+\setlength{\abovedisplayshortskip}{9pt}
+\setlength{\belowdisplayshortskip}{2pt}
+
+\setlength{\belowdisplayshortskip}{\belowdisplayskip}
+
+\setlength{\baselineskip}{10pt}
+
+% \usepackage{setspace}
+% \setstretch{1.25}
+
+\renewcommand{\figurename}{Fig.}
+\renewcommand{\tablename}{Tabla}
+
+\usepackage{caption}
+% \captionsetup{labelformat=empty}
+
+% \renewcommand{\contentsname}{Índice}
+\renewcommand\contentsname{\vspace*{-45pt}}
+
+% TOC dots separation
+% \renewcommand{\cftdotsep}{10}
+
+% \setlength{\cftsecindent}{0pt}% Remove indent for \section
+% \setlength{\cftsubsecindent}{5pt}% Remove indent for \subsection
+% \setlength{\cftsubsubsecindent}{0pt}% Remove indent for \subsubsec
+
+\setcounter{tocdepth}{4}
+
+\usepackage{titling}
+\renewcommand{\maketitle}{ 
+	\begin{flushleft}
+	{\bfseries\Huge\thetitle}
+	\vspace{1mm}
+	\end{flushleft}
+	% \thispagestyle{empty}
+}
+
+% remove the page number from all the pages that the TOC occupies
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+
+% add page break after TOC set it to page number 1
+\let\oldtableofcontents\tableofcontents % remember the definition
+\renewcommand\tableofcontents{
+	\oldtableofcontents % use the standard toc
+	\thispagestyle{empty}
+	\pagebreak
+	\setcounter{page}{1}
+}
+
+% Set text color for all document
+% \color{ugrey}
+
+\usepackage[titles]{tocloft}
+\renewcommand{\cftdotsep}{1.5}
+\renewcommand{\cftsetpnumwidth}{1.5}
+\renewcommand{\cftsetrmarg}{1.5}
+
+\usepackage{float}
+\makeatletter
+\def\fps@figure{H}
+\makeatother
+
+% nicer chemical figures
+\usepackage{chemfig}
+
+% change style of quote, see also https://tex.stackexchange.com/a/436253/114857
+\usepackage[most]{tcolorbox}
+
+
+\definecolor{linequote}{RGB}{224,215,188}
+\definecolor{bordercolor}{RGB}{221,221,221}
+% \definecolor{backquote}{RGB}{249,245,233}
+\definecolor{backquote}{RGB}{230,230,230}
+
+% change left border: https://tex.stackexchange.com/a/475716/114857
+% change left margin: https://tex.stackexchange.com/a/457936/114857
+\newtcolorbox{myquote}[1][]{%
+	enhanced jigsaw,
+	% unbreakable,
+	breakable,
+	size=minimal,
+	left=18pt,
+	top=12pt,
+	bottom=12pt,
+	right=12pt,
+	boxrule=1pt,
+	sharp corners=all,
+	colback=bgcolor,
+	colframe=black,
+    segmentation style={
+        bottomrule first=0pt,
+        toprule middle=0pt,
+        bottomrule middle=0pt,
+        toprule last=0pt,
+    },
+	#1}
+
+\usepackage{enumitem}
+\usepackage{pifont}
+
+\setlist[itemize,1]{label=\small\ding{72}}
+\setlist[itemize]{leftmargin=1.0em, itemsep=0pt, topsep=0pt, labelsep=3pt}
+\setlist[enumerate]{leftmargin=1.5em, itemsep=0pt, topsep=0pt, labelsep=3pt}
+
+% redefine quote environment to use the myquote environment, see
+% https://tex.stackexchange.com/a/337587/114857
+% \renewenvironment{quote}{
+% 	\begin{myquote}
+% 	\setlist[1]{leftmargin=11pt}}
+% 	{\setlist[1]{leftmargin=!}
+% 	\end{myquote}}
+\renewenvironment{quote}{
+	\begin{myquote}
+	\setlist[1]{leftmargin=12pt,rightmargin=12pt}}
+	{\setlist[1]{leftmargin=!}
+	\end{myquote}}
+
+% better fractions
+\usepackage{nicefrac,xfrac}
+
+% surround footnotes number with square brackets and always use numbers (even
+% inside quoted text)
+% https://www.overleaf.com/learn/latex/Footnotes
+\renewcommand*{\thefootnote}{\ [\arabic{footnote}]\ }
+\renewcommand*{\thempfootnote}{\ [\arabic{mpfootnote}]\ }
+
+% space between text and footer
+\setlength\footskip{44pt}
+\setlength{\skip\footins}{12pt}
+
+% align first letter of all the lines in the footnotes
+\usepackage[bottomfloats,belowfloats,hang]{footmisc}
+\setlength{\footnotemargin}{1em}
+
+\newcommand{\unit}[2]{\nicefrac{#1}{#2}}
+
+\usepackage{amsfonts}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tabularx}
+
+\usepackage{bbding} % HandRight (install texlive-fontsextra)
+
+\setlength{\columnsep}{12pt}
+\usepackage{makecell}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+
+\usepackage{array}
+
+% Contents of listings-setup.tex
+\usepackage{xcolor}
+
+\lstset{
+    basicstyle=\ttfamily,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=0,
+    numbersep=5pt,
+    backgroundcolor=\color{bgcolor},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=true,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    breakautoindent=false,
+    breakindent=0pt,
+    columns=fullflexible,
+    linewidth=\columnwidth,
+    frame=single,
+    framesep=2pt,
+    xleftmargin=2pt,
+    xrightmargin=2pt,
+    aboveskip=6pt,
+    belowskip=-2pt,
+    rulecolor=\color{bgcolor}
+}
