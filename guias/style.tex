@@ -15,7 +15,7 @@
 \usepackage{utfsym}
 
 % make pictures caption font bold and small
-\usepackage[font={footnotesize,bf}]{caption}
+\usepackage[font={footnotesize}]{caption}
 
 % inline code (backticks in md)
 \linespread{1.10}
@@ -187,8 +187,9 @@ BoldFont        =   *-Bold,
 % change left border: https://tex.stackexchange.com/a/475716/114857
 % change left margin: https://tex.stackexchange.com/a/457936/114857
 \newtcolorbox{myquote}[1][]{%
-	enhanced,
-	unbreakable,
+	enhanced jigsaw,
+	% unbreakable,
+	breakable,
 	size=minimal,
 	left=10pt,
 	top=10pt,
@@ -198,6 +199,12 @@ BoldFont        =   *-Bold,
 	sharp corners=all,
 	colback=bgcolor,
 	colframe=black,
+    segmentation style={
+        bottomrule first=0pt,
+        toprule middle=0pt,
+        bottomrule middle=0pt,
+        toprule last=0pt,
+    },
 	#1}
 
 \usepackage{enumitem}
@@ -211,7 +218,7 @@ BoldFont        =   *-Bold,
 % 	\end{myquote}}
 \renewenvironment{quote}{
 	\begin{myquote}
-	\setlist[1]{leftmargin=18pt,rightmargin=8pt}}
+	\setlist[1]{leftmargin=12pt,rightmargin=12pt}}
 	{\setlist[1]{leftmargin=!}
 	\end{myquote}}
 
@@ -225,8 +232,8 @@ BoldFont        =   *-Bold,
 \renewcommand*{\thempfootnote}{\ [\arabic{mpfootnote}]\ }
 
 % space between text and footer
-\setlength\footskip{25pt}
-\setlength{\skip\footins}{12pt}
+\setlength\footskip{35pt}
+\setlength{\skip\footins}{8pt}
 
 % align first letter of all the lines in the footnotes
 \usepackage[bottomfloats,belowfloats,hang]{footmisc}
