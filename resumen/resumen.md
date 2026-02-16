@@ -53,8 +53,8 @@ que tarda la señal en viajar físicamente por el medio, resulta del cociente
 entre la distancia del enlace $d$ (en metros) y la velocidad de propagación del
 medio $v_{prop}$ (en metros por segundo).
 
-El **throughput** es la tasa a la que se envían los bits de la fuente a destino, el
-throughput extremo a extremo queda determinado por el enlace de menor tasa de
+El **throughput** es la tasa a la que se envían los bits de la fuente a destino,
+el throughput extremo a extremo queda determinado por el enlace de menor tasa de
 transmisión $R$ (en bits por segundo).
 
 <!--
@@ -135,7 +135,16 @@ el protocolo de transporte y el numero de **puerto**, el puerto identifica un
 servicio o aplicación especifica dentro del dispositivo, por convención se
 asignan diferentes números de puerto a diferentes aplicaciones[^1], siendo las
 más comunes el puerto 80 para HTTP, el puerto 443 para HTTPS, el puerto 22 para
-SSH, etc. A continuación se muestran ejemplos de sockets:
+SSH, etc. Los puertos pueden ser bien conocidos (Well-Known Ports), registrados
+(Registered Ports) o dinamicos/privados/efímeros (Ephemeral Ports). Los puertos 
+bien conocidos están en el rango 0-1023 y se reservan para servicios de red
+estándar (como HTTP, SSH, etc); los puertos registrados son utilizados por
+aplicaciones específicas, empresas o protocolos registrados para evitar
+conflictos, están en el rango (1024-49151); los puertos efímeros están en el
+rango 49141-65535 y son utilizados por las aplicaciones cliente para iniciar
+conexiones hacia servidores. Se llaman "efímeros" porque son temporales; el
+sistema operativo asigna uno al azar cuando una aplicación lo necesita y lo
+libera al cerrar la conexión. A continuación se muestran ejemplos de sockets:
 
 [^1]: List of TCP and UDP port numbers, [https://en.wikipedia.org/w/index.php?title=List_of_TCP_and_UDP_port_numbers](https://en.wikipedia.org/w/index.php?title=List_of_TCP_and_UDP_port_numbers)
 
@@ -489,20 +498,42 @@ rtt min/avg/max/mdev = 3.955/4.032/4.109/0.077 ms
 ### traceroute
 
 ```console
-root@redes:~# traceroute example.com
-traceroute to example.com (104.18.26.120), 30 hops max, 60 byte packets
- 1  10.0.2.2 (10.0.2.2)  0.135 ms  0.077 ms  0.057 ms
- 2  192.168.1.1 (192.168.1.1)  0.427 ms  0.595 ms  0.717 ms
- 3  200.51.241.1 (200.51.241.1)  4.393 ms  4.440 ms  5.300 ms
- 4  200.51.240.61 (200.51.240.61)  4.494 ms  5.515 ms 213.140.39.119 (213.140.39.119)  5.963 ms
- 5  213.140.39.116 (213.140.39.116)  5.533 ms  5.573 ms  5.730 ms
- 6  cloudflare-ae70-0-grtbueba1.net.telefonicaglobalsolutions.com (94.142.103.101)  7.419 ms 5.53.7.242 (5.53.7.242)  3.135 ms  4.082 ms
- 7  198.41.228.7 (198.41.228.7)  17.473 ms 198.41.228.5 (198.41.228.5)  9.111 ms cloudflare-ae70-0-grtbueba1.net.telefonicaglobalsolutions.com (94.142.103.101)  8.244 ms
- 8  198.41.228.7 (198.41.228.7)  4.496 ms  4.543 ms  4.683 ms
- 9  104.18.26.120 (104.18.26.120)  4.321 ms  4.655 ms  4.674 ms
+root@redes:~# traceroute fi.uba.ar
+traceroute to fi.uba.ar (186.33.219.219), 30 hops max, 60 byte packets
+ 1  _gateway (192.168.1.1)  0.354 ms  0.547 ms  0.724 ms
+ 2  200.51.241.1 (200.51.241.1)  4.797 ms  4.849 ms *
+ 3  * IPCUY03-Valan-573.mrse.com.ar (200.63.152.13)  4.894 ms *
+ 4  ARSAT-NAC.mrse.com.ar (200.63.152.14)  6.617 ms * *
+ 5  73.254.33.186.in-addr.arpa (186.33.254.73)  7.991 ms * *
+ 6  74.254.33.186.in-addr.arpa (186.33.254.74)  7.905 ms  6.933 ms  7.026 ms
+ 7  49.254.33.186.in-addr.arpa (186.33.254.49)  7.729 ms * *
+ 8  217.219.33.186.in-addr.arpa (186.33.219.217)  5.664 ms * *
+ 9  219.219.33.186.in-addr.arpa (186.33.219.219)  7.260 ms * *
 ```
 
 ### dig
+
+```console
+; <<>> DiG 9.20.18 <<>> example.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 44701
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;example.com.			IN	A
+
+;; ANSWER SECTION:
+example.com.		300	IN	A	104.18.27.120
+example.com.		300	IN	A	104.18.26.120
+
+;; Query time: 28 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8) (UDP)
+;; WHEN: Mon Feb 16 02:29:31 -03 2026
+;; MSG SIZE  rcvd: 72
+```
 
 ## Nivel de transporte
 
@@ -1125,7 +1156,11 @@ subredes con la mitad de capacidad de hosts. Por ejemplo se tiene la red
 192.168.1.0/24 la cual tiene capacidad para 253 hosts (debido a que la dirección
 0 representa la red y la dirección 255 se usa para broadcast). Tomando un bit
 más de mascara se tienen dos subredes 192.168.1.0/25 y 192.168.1.128/25  ambas
-con capacidad para 126 hosts.
+con capacidad para 126 hosts. El subnetting se puede hacer tomando mascaras
+fijas (Fixed Length Subnet Mask, FLSM) o tomando mascaras variables (Variable
+Length Subnet Mask, VLSM) la diferencia radica en que con FLSM la mascara es
+fija para toda la subred, mientras que con VLSM se puede tomar diferentes
+longitudes de mascara para diferentes porciones de la subred creada.
 
 Supernetting es el proceso inverso al Subnetting, es reducir el numero de
 bits que ocupa la mascara agrupando multiples redes. Por ejemplo se tienen las
@@ -1364,11 +1399,10 @@ común.
 
 El ruteo se puede dividir en **ruteo interno** y **ruteo externo** de acuerdo al
 alcance y tipos de protocolos que se utilizan para establecer las rutas. El
-ruteo interno (Interior Gateway Protocol, IGP) se realiza dentro de un mismo
-sistema autónomo, por ejemplo dentro de una empresa u organización. El ruteo
-externo (Exterior Gateway Protocol, EGP) se usa para intercambiar rutas entre
-diferentes sistemas autónomos, es decir, entre redes diferentes, generalmente a
-través de internet.
+ruteo interno se realiza dentro de un mismo sistema autónomo, por ejemplo dentro
+de una empresa u organización. El ruteo externo se usa para intercambiar rutas
+entre diferentes sistemas autónomos, es decir, entre redes diferentes,
+generalmente a través de internet.
 
 Los protocolos de ruteo definen como se deben intercambiar los mensajes con los
 nodos adyacentes, el formato del mensaje, cada cuanto se intercambian los
@@ -1403,12 +1437,16 @@ intercambian los mensajes entre los nodos, cada cuanto tiempo, el formato del
 mensaje, etc., recolectan información de la red y ejecutan algoritmos sobre la
 información recolectada para determinar la ruta más optima. Los protocolos de
 ruteo se diferencian principalmente en internos y externos, los protocolos de
-ruteo interno (Interior Gateway Protocol, IRP) se utilizan dentro de un sistema
+ruteo interno (Interior Gateway Protocols, IGP) se utilizan dentro de un sistema
 autónomo mientras que los protocolos de ruteo externo (Exterior Gateway
-Protocol, EGP) se utilizan entre sistemas autónomos. Los protocolos de
+Protocols, EGP)[^2] se utilizan entre sistemas autónomos. Los protocolos de
 ruteo interno se pueden clasificar según el tipo de algoritmo que ejecutan,
 siendo los más conocidos los protocolos de distancia vectorial y los protocolos
 de estado de enlace.
+
+[^2]: Hay que tener en cuenta que también existe un protocolo de ruteo externo
+    obsoleto con las mismas siglas y un nombre parecido: Exterior Gateway
+    Protocol, EGP.
 
 Los protocolos de tipo vector distancia son más antiguos, o primitivos, el más
 conocido de este tipo es RIPv1 y la version actualizada RIPv2 (también existe
@@ -1417,18 +1455,20 @@ algoritmos más avanzados, por ejemplo el algoritmo de Dijkstra, para determinar
 la ruta más corta. El más protocolo más conocido de tipo link state es SPF y su
 version abierta OSPF.
 
-##### Vector distancia
+#### Vector distancia
 
 <!--
 Contra: se pueden generar lazos ya que solo se conoce la información (tabla de
 ruteo) de los nodos adyacentes.
 -->
 
-En los algoritmos de distancia vectorial la mejor ruta se determina aplicando el
-algoritmo de Bellman-Ford. Este algoritmo calcula los caminos mínimos desde un
-nodo origen hacia todos los demás nodos, para esto cada router debe mantener una
-tabla con destino, costo y next-hop. La tabla de cada nodo se actualiza de
-acuerdo a actualizaciones periódicas que recibe de sus nodos adyacentes. 
+En los protocolos de ruteo de vector distancia (Distance Vector, DV) la mejor
+ruta se determina aplicando el algoritmo de Bellman-Ford. Este algoritmo calcula
+los caminos mínimos desde un router origen hacia todos los demás routers, para
+esto cada router debe mantener una tabla con destino, costo y next-hop. La tabla
+de cada nodo se actualiza de acuerdo a actualizaciones periódicas que recibe de
+sus nodos adyacentes. Esta tabla de ruteo en cada router no contiene informacion
+de toda la red, si no mas bien de los routers adyacentes.
 
 \begin{figure}[H]
   \centering
@@ -1472,42 +1512,80 @@ Este proceso de intercambio ocurre continuamente cada un período de
 tiempo determinado por el protocolo, por ejemplo para RIPv1 es de 30 segundos.
 -->
 
-###### RIP
+##### RIP
 
 El protocolo de información de rutas (Routing Information Protocol, RIP) fue uno
 de los primeros protocolos de ruteo interno dinámico basado en vector distancia.
 Utiliza como métrica la cantidad de saltos y se limita a 15 para prevenir el
 problema de lazos infinitos, esto pone un limita el tamaño de la red. Si la
-distancia entre un punto y otro en la red es 16, entonces se considera
+distancia entre un punto y otro en la red es mayor a 15, entonces se considera
 distancia **infinita** y por tanto ese punto es inalcanzable. El protocolo RIP
 implementa también los mecanismos de horizonte dividido (Split Horizon) y
 envenenamiento de ruta (Route Poisoning) para prevenir lazos.
 
-Por ser un algoritmo de distancia vectorial los nodos compartes su tabla de
-ruteo con los nodos adyacentes mediante actualizaciones periódicas. En RIP las
+Por ser un algoritmo de distancia vectorial los routers comparten su tabla de
+ruteo con los routers adyacentes mediante actualizaciones periódicas. En RIP las
 actualizaciones por defecto ocurren cada 30 segundos, aunque este es un
 parámetro que en muchos casos es configurable.
 
-La version 1 del protocolo RIPv1 se publicó en 1988. Un router luego de
-configurarse el protocolo y pasados 30 segundos (el timer por defecto) emite un
-datagrama de petición de RIPv1 a la dirección broadcast (dirección
+En la primer version de RIP, RIPv1, los routers realizan peticiones a los
+routers adyacentes mediante mensajes RIP de tipo request con la dirección de
+broadcast 255.255.255.255, estos mensajes se encapsulan en paquetes UDP y se
+utiliza el puerto 520. Si bien los mensajes llevan la dirección de broadcast,
+los routers adyacentes no reenvían este tipo de mensajes. Un router que recibe
+un mensaje de petición del protocolo RIPv1 responde con su tabla de ruteo, con
+esta información el router que hizo la petición originalmente actualiza su
+tabla. Estos mensajes se originan en cada router de la red al momento de
+intercambiar información, lo que causa trafico en la red periódicamente.
+
+En la segunda version del protocolo, RIPv2, se agrega soporte para la mascara de
+red (CIDR) ya que en la primer version solo soporta direccionamiento con clases.
+También se cambia la dirección de broadcast 255.255.255.255 por una multicast
+224.0.0.9, esto provoca que solo los routers que ejecuten el protocolo RIPv2
+escuchen esa dirección, reduciendo la carga innecesaria en otros dispositivos de
+la red. La segunda version añadió soporte para autenticación (mediante texto
+plano o MD5) esto previene que alguien conecte un router malicioso y "envenene"
+las tablas de ruteo de tu red.
+
+El protocolo RIP en general tiene un tiempo de convergencia lento, ya que la
+información se actualiza en intervalos relativamente grandes (30 segundos). Por
+ejemplo si un enlace se cae se debe esperar ese tiempo hasta que se actualicen
+las tablas de ruteo. Además si pasan 180 segundos sin recibir actualizaciones de
+un router adyacente se marca la ruta como dudosa y si pasan 240 segundos se
+elimina por completo esa ruta de la tabla de ruteo.
+
+<!--
+La primer versión del protocolo RIP, RIPv1, se publicó en 1988. Un router luego
+de configurarse el protocolo y pasados 30 segundos (el timer por defecto) emite
+un datagrama de petición RIPv1 a la dirección broadcast (dirección
 255.255.255.255) a todas las interfaces con RIPv1 habilitado. Luego los
-dispositivos corriendo el mismo protocolo responde con su tabla de ruteo.
+dispositivos corriendo el mismo protocolo responde con su tabla de ruteo. El
+router que hace la peticion es quien actualiza su tabla de ruteo con las
+respuestas que obtiene de los nodos adyacentes.
+-->
 
 ###### Split horizon
 
-Compensa los efectos de la cuenta a infinito Los routers no anuncian rutas por
-las interfaces que las aprendieron(recibieron)
+Compensa los efectos de la cuenta a infinito, o lazos, prohibiendo a los routers
+enviar información a través de una ruta por la que aprendieron esa ruta, por
+ejemplo un router A aprende una ruta debido a información que le llega del
+router adyacente B, entonces si el router adyacente B realiza una petición a A,
+este no le enviara esa ruta que aprendió previamente de B.
 
-En split horizon con poison reverse las rutas se publican pero con métrica
-infinito.
+En split horizon con poison reverse si un enlace se cae las rutas comparten de
+todas formas pero con métrica infinita (por convención 16), sin poison reverse
+simplemente no se compartían las rutas.
 
-##### Link state
+#### Estado de enlace
 
-En los algoritmos de estado de enlace cada nodo dispone de un mapa completo de
-la red, y entre nodos adyacentes se intercambian sus mapa completos.
+En los algoritmos de estado de enlace (Link State, LS) cada nodo dispone de un
+mapa completo de la red en forma de grafo (se pueden representar como tablas) y
+entre nodos adyacentes se intercambian sus mapas completos. Cada router luego
+independientemente ejecuta un algoritmo de ruteo para determinar las rutas
+optimas entre ese router y todos los posibles destinos de la red. La colección
+de rutas optimas determinada por el algoritmo formará la tabla de ruteo.
 
-###### SPF/OSPF
+#### SPF/OSPF
 
 El camino más corto primero (Shortest Path First, SPF) es un protocolo de
 ruteo interno de tipo link state que calcula el coste mínimo desde un router
@@ -1521,19 +1599,30 @@ First, OSPF). OSPF es un protocolo de enrutamiento interior (IGP) de tipo estado
 de enlace (link-state), utilizado dentro de un Sistema Autónomo (AS).
 -->
 
-#### Policy-Based Routing
+#### BGP
 
-Los algoritmos de ruteo basados en políticas PBR permiten seleccionar la ruta de
+El protocolo de puerta de enlace de frontera (Border Gateway Protocol, BGP) es
+un protocolo de ruteo externo que se utiliza entre sistemas autónomas para
+intercambiar información de ruteo garantizando que estas estén libres de bucles.
+Es el protocolo principal de publicación de rutas utilizado por las compañías
+más importantes de ISP en Internet.
+
+A diferencia de los protocolos de ruteo internos (IGP), como RIP u OSPF, no se
+usan métricas como número de saltos, ancho de banda o retardos. En cambio, BGP
+toma decisiones de encaminamiento basándose en políticas de la red (**Policy
+Based Routing, PBR**), o reglas que utilizan varios atributos de ruta. Los
+protocolos de ruteo basados en políticas, PBR, permiten seleccionar la ruta de
 un paquete según criterios como origen, protocolo, puerto, tipo de tráfico o
 marca, en lugar de usar solo la tabla de ruteo tradicional.
-
 
 ### SDN
 
 En las Redes definidas por software (Software-defined Networks, SDN) los
 dispositivos de red (switches, routers, etc) no tienen funciones asignadas como
 en las redes tradicionales, si no que un controlador centralizado les asigna una
-función.
+función. En términos conceptuales, se puede decir que en una red definida por
+software el plano de control de una red esta administrado por un solo
+controlador.
 
 ### OpenFlow
 
@@ -1561,7 +1650,7 @@ mediante una pareja de números hexadecimales y cada pareja separada por dos
 puntos o guiones, por ejemplo `00:1A:2B:3C:4D:5E` o `1A-23-F9-CD-06-9B`, pero
 existen otros formatos validos.
 
-### Protocolo ARP
+### ARP
 
 Dado que existen tanto direcciones de la capa de red (por ejemplo, direcciones
 IP de Internet) como direcciones de la capa de enlace (es decir, direcciones
@@ -1575,8 +1664,10 @@ host emisor 222.222.222.220 proporciona a su módulo ARP la dirección IP
 222.222.222.222 y el módulo ARP devuelve la correspondiente dirección MAC
 49:BD:D2:C7:56:2A.
 
-Un mensaje ARP de consulta se envía dentro de una trama de difusión, mientras
-que el mensaje ARP de respuesta se envía dentro de una trama estándar.
+Un mensaje ARP de consulta se envía dentro de una trama de difusión, la cual a
+nivel de enlace es, FF:FF:FF:FF:FF:FF, esto hace que la reciban todas las
+interfaces dentro de esa misma red, el mensaje ARP de respuesta se envía dentro
+de una trama estándar.
 
 Un paquete ARP se encapsula dentro de una trama de la capa de enlace y así se
 sitúa, arquitectónicamente, encima de la capa de enlace. Sin embargo, un paquete
@@ -1685,7 +1776,7 @@ Si se detecta un ciclo extra entre switches se ejecuta un algoritmo que
 deshabilita ese enlace redundante. Los bridges o switches que ejecutan el
 algoritmo intercambian información con mensajes de control denominados Bridge
 Protocol Data Unit (o BPDU). El BPDU siempre tiene dirección de destino
-:1:80:C2:00:00:00.
+01:80:C2:00:00:00.
 
 * Detectan posibles ciclos entre switches.
 * Construyen una topología lógica sin bucles (en forma de árbol).
@@ -1754,6 +1845,22 @@ mandar tramas de gestión (o probe requests) los cuales se envían en todos los
 canales y en todas las bandas un canal y una banda a la vez, de esta forma se
 descubren las redes inalámbricas.
 
+Cuando un Access Point (AP) está en modo **infraestructura**, significa que
+opera como punto central de comunicación y permite que los dispositivos
+inalámbricos se conecten a una red cableada o a otros dispositivos a través de
+él. Los clientes inalámbricos no se comunican directamente entre sí. Todo el
+tráfico pasa por el AP. El AP normalmente está conectado a un switch o router.
+
+```text
+Cliente 1
+    \
+     AP --- Switch --- Router --- Internet
+    /
+Cliente 2
+```
+
+Otros modos incluyen, bridge, repetidor, mesh y monitor.
+
 #### Sistema distribuido
 
 En el estándar 802.11, el sistema distribuido (o Distributed System, DS) es el
@@ -1778,11 +1885,39 @@ portadora (Carrier Sense, CS), la función de coordinación distribuida
 (Acknowledgment Frames, ACK) y las peticiones de envió y recepción (Request to
 Send/Clear to Send, RTS/CTS).
 
-##### Carrier Sense
+El **mecanismo de acceso múltiple por detección de portadora con evitación de
+colisiones** (Carrier Sense Multiple Access with Collision Avoidance,
+**CSMA/CA**) es un mecanismo que permite a un dispositivo inalámbrico verificar
+si el medio de transmisión esta libre antes de enviar datos. La principal
+diferencia con CSMA/CD utilizado en Ethernet 802.3 es que con CSMA/CA se
+verifica el estado de la red previo a enviar información, mientras que en
+CSMA/CD se envían los datos y se detecta si hubo colisión durante la
+transmisión.
+
+Además del mecanismo CSMA/CA para acceder al medio se utiliza otro mecanismo de
+"censado virtual" el cual se denomina **vector de asignación de red** (Network
+Allocation Vector, **NAV**) con este mecanismo las tramas MAC 802.11 llevan un
+campo de duración en el que se especifica cuanto tiempo se necesitará para
+transmitirla y por consiguiente por cuanto tiempo el medio estará ocupado. Las
+estaciones escuchando el medio inalámbrico leen también ese campo de duración y
+actualizan su timer interno de NAV el cual les indica por cuanto tiempo deberán
+esperar al medio.
+
+El **problema del nodo oculto** ocurre cuando dos nodos en una misma red no se
+escuchan entre si y por tanto no pueden actualizar el timer NAV.
 
 ##### DCF
 
-##### ACK
+La **función de coordinación distribuida** (Distributed Coordination Function,
+**DCF**) es un método de acceso al medio que utiliza los mecanismos de CSMA/CA y
+NAV para regular como dispositivos acceden a una red inalámbrica de manera tal
+que no haya colisiones.
+
+En DCF cada estación que desee transmitir una trama debe esperar un intervalo
+especifico de tiempo antes de que el medio este disponible. Este intervalo de
+tiempo se conoce como espacio de inter-frame distribuido (Distributed
+Inter-Frame Space, **DIFS**). Luego de que termine el DIFS la estación debe
+competir por el medio.
 
 ##### RTS/CTS
 
