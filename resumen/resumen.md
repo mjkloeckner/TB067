@@ -41,21 +41,26 @@ enlaces con diferentes características) en cuyo caso, si el nodo dispone de
 memoria libre se encola, produciendo un retardo de encolamiento, o si el nodo no
 dispone de memoria libre se descarta esa unidad, provocando una perdida de
 datos. Además del retardo de encolamiento existen otros retardos que
-caracterizan lo que se denomina **retardo extremo a extremo**, que es el tiempo
-total que tarda un paquete en ir desde el origen hasta el destino. Los retardos
-son: el retardo de procesamiento, el retardo de propagación y el retardo de
-transmisión. El retardo de procesamiento es el tiempo que se tarda un nodo en
-examinar el encabezado del paquete. El retardo de transmisión es el tiempo
-necesario para poner todos los bits del paquete en el enlace y resulta del
-cociente entre el tamaño del paquete $L$ (en bits) y la tasa de transmisión del
-enlace $R$ (en bits por segundo o bps). El retardo de propagación es el tiempo
-que tarda la señal en viajar físicamente por el medio, resulta del cociente
-entre la distancia del enlace $d$ (en metros) y la velocidad de propagación del
-medio $v_{prop}$ (en metros por segundo).
+caracterizan lo que se denomina **retardo extremo a extremo** o **latencia**,
+que es el tiempo total que tarda un paquete en ir desde el origen hasta el
+destino. Los retardos son: el retardo de procesamiento, el retardo de
+propagación y el retardo de transmisión. El retardo de procesamiento es el
+tiempo que se tarda un nodo en examinar el encabezado del paquete. El retardo de
+transmisión es el tiempo necesario para poner todos los bits del paquete en el
+enlace y resulta del cociente entre el tamaño del paquete $L$ (en bits) y la
+tasa de transmisión del enlace $R$ (en bits por segundo o bps). El retardo de
+propagación es el tiempo que tarda la señal en viajar físicamente por el medio,
+resulta del cociente entre la distancia del enlace $d$ (en metros) y la
+velocidad de propagación del medio $v$ (en metros por segundo).
 
-El **throughput** es la tasa a la que se envían los bits de la fuente a destino,
-el throughput extremo a extremo queda determinado por el enlace de menor tasa de
-transmisión $R$ (en bits por segundo).
+El **throughput** es la tasa a la que se envían los bits de la fuente a
+destino, en otras palabras, es la cantidad real de datos útiles que una red
+transmite por unidad de tiempo. El throughput extremo a extremo queda
+determinado por el enlace de menor tasa de transmisión $R$ (en bits por
+segundo). Se mide típicamente en bits por segundo (bps). Por ejemplo un enlace
+de 1 Gbps puede tener un throughput real de 940 Mbps debido al overhead
+Ethernet/IP/TCP. También se dice en TCP que el throughput es la cantidad de
+datos que se pueden estar en el enlace sin recibir validacion ACK.
 
 <!--
 Un modelo de comunicaciones es una representación conceptual que describe como
@@ -122,7 +127,7 @@ Existen dos paradigmas principales de la comunicación entre terminales: el
 paradigma cliente-servidor y el peer-to-peer (abreviado P2P). El paradigma
 cliente-servidor involucra la comunicación entre: un cliente, que realiza una
 petición por un servicio, y un servidor, que siempre debe estar disponible para
-responde a esa petición. En el paradigma peer-to-peer los dispositivos de una
+responder a esa petición. En el paradigma peer-to-peer los dispositivos de una
 red intercambian recursos entre sí, compartiendo carga, control y datos, no hay
 un servidor siempre disponible para satisfacer las peticiones si no que cada
 nodo ofrece y solicita recursos.
@@ -252,8 +257,8 @@ devolver códigos de estado.
 
 ##### HTTP/1.1 (1997-1999)
 
-En esta versión se mejoró significativamente la eficiencia al incorporar
-conexiones persistentes, permitiendo reutilizar una misma conexión TCP para
+En esta versión se mejoró significativamente la eficiencia al definir conexiones
+persistentes por defecto, permitiendo reutilizar una misma conexión TCP para
 varias solicitudes. También se añadió soporte para hosts virtuales, mejores
 mecanismos de caché y control de errores. Se introdujo el concepto de pipelining
 lo cual permite enviar varias solicitudes sin esperar respuestas, pero esto no
@@ -353,7 +358,11 @@ Subject: Hello, World!
 #### Mail User Agent
 
 El agente de usuario de mail es la aplicación que un usuario utiliza para
-conectarse con el servidor de correo.
+conectarse con el servidor de correo. En los orígenes del correo electrónico
+cada usuario típicamente tenia un servidor de correo ejecutándose en su estación
+y el agente de usuario se conectaba a este de manera directa. Hoy en día es más
+común que el servidor de correo esté ejecutándose en algún host de la red, y el
+agente de usuario de mail se conecte a este también a través de la red.
 
 #### Protocolos de acceso de correo
 
@@ -402,7 +411,8 @@ existen tres clases de servidores DNS: los servidores DNS raíz, los servidores
 DNS de dominio de nivel superior (Top-Level Domain, TLD) y los servidores DNS
 autoritativos. Un servidor DNS **autoritativo** mantiene los registros oficiales
 de una zona DNS, mientras que un servidor **no autoritativo** resuelve consultas
-usando caché o consultando a otros servidores.
+usando caché o consultando a otros servidores, los cuales en ultima instancia
+pueden ser servidores DNS autoritativos si no existe ningún cache.
 
 Suponga que un cliente DNS desea determinar la dirección IP correspondiente al
 nombre de host `www.amazon.com`. En una primera aproximación tienen lugar los
@@ -477,12 +487,23 @@ esto es un identificador único para un host dado, y el campo Nombre es un alias
 que apunta a ese host. Por ejemplo un alias puede ser `ejemplo.com` que
 "apunta" al nombre canónico `relay1.bar.ejemplo.com`.
 
+<!--
+```text
+(blog.example.com, www.example.com, CNAME)
+```
+-->
+
 En los registros de tipo MX, el campo Valor es un nombre canónico de un servidor
 de correo con un alias dado por el campo Nombre. Por ejemplo el registro
 `(foo.com, mail.bar.foo.com, MX)` es un registro MX. Los registros MX permiten a
 los nombres de host de los servidores de correo tener alias simples.
 
 ### ping
+
+El comando ping envía mensajes ICMP (capa de red) de tipo **echo request** a un
+host dado, si el host esta activo y le llegan estos mensajes, puede responder
+con el mismo tipo de mensajes ICMP pero con tipo **echo reply**. En base a estos
+mensajes se elabora la salida del comando.
 
 ```console
 root@redes:~# ping -4 -c 2 google.com
@@ -496,6 +517,17 @@ rtt min/avg/max/mdev = 3.955/4.032/4.109/0.077 ms
 ```
 
 ### traceroute
+
+El comando traceroute es una herramienta de diagnóstico que sirve para mostrar
+la ruta que sigue un paquete de datos desde la estación donde se ejecuta el
+comando hasta un destino. Funciona enviando mensajes de la capa de red,
+típicamente utilizando el protocolo UDP, con TTL (Time-to Live) creciente, es
+decir, comienza por el primer paquete con TTL 1, este TTL se decrementa en los
+routers por los que pasa el datagrama, por lo que en el primer router se
+decrementa y dado que es cero se descarta, el router envía al host desde donde
+se originó el datagrama un mensaje ICMP de tipo 11, time exceeded, y código 0,
+Time to Live exceeded in Transit, luego se envía otro datagrama con TTL 2 y así
+sucesivamente hasta llegar al host destino.
 
 ```console
 root@redes:~# traceroute fi.uba.ar
@@ -714,7 +746,7 @@ la sesión en ambos extremos.
 \draw[->, green!60!black] (0,-3.15) -- node[above, sloped, yshift=-2pt]{ACK} (6,-3.65);
 
 \end{tikzpicture}
-\caption{Cierre de una conexión TCP}
+\caption{Cierre limpio de una conexión TCP}
 \label{fig:tcp-fin}
 \end{figure}
 
@@ -739,9 +771,20 @@ flujo que regula cuántos bytes puede enviar un emisor sin recibir confirmación
 La ventana deslizante permite que el emisor envié multiples segmentos seguidos
 sin esperar el segmento de validación de receptor instantáneamente.
 
-Se implementa
+Se puede determinar la ventana TCP mediante el producto de el throughput y el
+RTT del enlace (o Bandwidth-delay product, BDP).
 
-##### Slow start
+$$\text{Ventana TCP } = \text{Throughput}\cdot\text{RTT}$$
+
+Si la ventana es menor que el BDP el emisor se queda sin datos para enviar y el
+enlace queda parcialmente ocioso, por lo que no resulta eficiente.
+
+El throughput queda limitado
+
+Si la ventana es mayor o igual al BDP, entonces el enlace se mantiene lleno y se
+alcanza el máximo throughput posible.
+
+<!-- ##### Slow start -->
 
 ##### Fast retransmit
 
@@ -797,10 +840,10 @@ emisor retransmita el segmento perdido.
 
 #### Transmisión de datos
 
-La flag `PSH` indica al receptor que debe enviar los datos recibidos
+La flag PSH indica al receptor que debe enviar los datos recibidos
 inmediatamente a la aplicación, sin almacenarlos en un buffer. Esto se utiliza
 cuando en un segmento se envía la totalidad de la petición, por lo que no hace
-falta que el receptor espere a mas datos.
+falta que el receptor espere a más datos.
 
 #### Maximum segment size
 
@@ -833,9 +876,9 @@ ocupando 20 bytes, de esta forma se llega a los 1500 bytes de segmento máximo.
 El Protocolo de datagramas de usuario (User Datagram Protocol, UDP) es un
 protocolo de transporte cuya función es enviar datagramas de forma rápida y
 simple, sin establecer conexión previa y sin garantizar entrega, orden ni
-control de errores.
+control de errores. Solo se verifica si el datagrama llego bien con un checksum.
 
-### QUIC
+<!-- ### QUIC -->
 
 ## Nivel de red
 
@@ -1245,7 +1288,7 @@ espacio para 62 host cada subred.
 
 Las direcciones de host también se pueden configurar manualmente, pero
 frecuentemente esta tarea se lleva cabo utilizando el Protocolo de configuración
-dinámica de host (DHCP, Dynamic Host Configuration Protocol).DHCP permite a un
+dinámica de host (DHCP, Dynamic Host Configuration Protocol). DHCP permite a un
 host obtener (permite que se le asigne) automáticamente una dirección IP. Un
 administrador de red puede configurar DHCP de modo que un host dado reciba la
 misma dirección IP cada vez que se conecte a la red, o bien a un host puede
@@ -1272,9 +1315,9 @@ A diferencia de la version anterior no se permite ni la fragmentación ni el
 reensamblado en routers intermedios; estas operaciones solo pueden ser
 realizadas por el origen y el destino. Si un router recibe un datagrama IPv6 y
 es demasiado largo para ser reenviado por el enlace de salida, el router
-simplemente lo descarta y envía de vuelta al emisor un mensaje de error ICMP
+simplemente lo descarta y envía de vuelta al emisor un mensaje de error ICMPv6
 "Paquete demasiado grande". El emisor puede entonces reenviar los datos
-utilizando un tamaño de datagrama IP más pequeño..
+utilizando un tamaño de datagrama IP más pequeño.
 
 \begin{table}[h]
 \centering\small
@@ -1329,6 +1372,18 @@ La cabecera IPv6 dispone de los siguientes campos:
    valor cero, el datagrama se descarta.
 7. Direcciones de origen y de destino (128 bits cada una): se usan para
    identificar quién envía el paquete y a quién debe llegar
+
+##### Neightbor Discovery Protocol
+
+El Neighbor Discovery Protocol (NDP) es un protocolo de la suite IPv6 que
+sustituye y mejora funciones que en IPv4 realizaban protocolos como ARP, ICMP
+Router Discovery y Redirect.
+
+En lugar de usar broadcast (que satura la red), NDP utiliza mensajes multicast
+más eficientes para que los nodos se comuniquen con sus vecinos en el mismo
+enlace. NDP opera mediante cinco tipos de mensajes ICMPv6: Router Solicitation
+(RS), Router Advertisement (RA), Neighbor Solicitation (NS), Neighbor
+Advertisement (NA) y Redirect.
 
 ### Protocolo ICMP
 
@@ -1452,7 +1507,7 @@ Los protocolos de tipo vector distancia son más antiguos, o primitivos, el más
 conocido de este tipo es RIPv1 y la version actualizada RIPv2 (también existe
 para direcciones IPv6). Los algoritmos link state son más modernos y utilizan
 algoritmos más avanzados, por ejemplo el algoritmo de Dijkstra, para determinar
-la ruta más corta. El más protocolo más conocido de tipo link state es SPF y su
+la ruta más corta. El protocolo más conocido de tipo link state es SPF y su
 version abierta OSPF.
 
 #### Vector distancia
@@ -1624,11 +1679,110 @@ función. En términos conceptuales, se puede decir que en una red definida por
 software el plano de control de una red esta administrado por un solo
 controlador.
 
+Por definición una red se dice definida por software si el plano de control esta
+separado físicamente del plano de datos, y se tiene un único plano de control
+para controlar todos los dispositivos de forwarding.
+
+Un flujo describe un conjunto de paquetes transferidos desde un dispositivo de
+la red a otro dispositivo.
+
+Policy-Based Routing (PBR) es un mecanismo de configuración en dispositivos
+tradicionales, mientras que SDN (Software-Defined Networking) es una
+arquitectura completa de red con separación explícita entre control y datos.
+
+PBR permite que el router tome decisiones de encaminamiento basadas en políticas
+distintas a la tabla de ruteo normal.
+
+#### Interfaz norte
+
+La interfaz norte es una API que permite tener acceso a información de la
+topología de bajo nivel de red (dispositivos, enlaces y hosts), y proporcionan
+una variedad de abstracciones para afectar el estado de la red.
+
+<!--
+Es la interfaz norte (Northbound Interface) que comunica el Controlador SDN con
+las Aplicaciones de Red.
+
+Función: Permite que los desarrolladores "le digan" a la red qué quieren que
+pase, sin saber nada del hardware. Es como el panel de control donde el
+administrador programa políticas de seguridad, balanceo de carga o calidad de
+servicio (QoS).
+
+Protocolos comunes: Generalmente utiliza REST APIs (JSON/XML).
+
+La interfaz norte es una API que permite tener acceso a información de la
+topología de bajo nivel de red (dispositivos, enlaces y hosts), y proporcionan
+una variedad de abstracciones para afectar el estado de la red. 
+-->
+
+#### Interfaz sur
+
+La interfaz sur es una API a través de la cual el núcleo del controlador
+interactúa con el entorno de red. Ejemplos de esta interacción son por ejemplo
+la obtención de estadísticas y la modificación del comportamiento de los
+switches. Los dos protocolos que pueden realizar esta función son OpenFlow y P4.
+
+<!--
+Es la interfaz sur (Southbound Interface) que comunica el Controlador SDN con
+los Dispositivos Físicos (Switches y Routers).
+
+Función: Traduce las políticas generales del controlador en instrucciones
+técnicas que el hardware entiende para mover los paquetes. Aquí es donde se
+"empujan" las reglas a las tablas de flujo.
+
+Protocolos comunes: OpenFlow, NETCONF, P4Runtime, SNMP o BGP.
+
+Analogía: Es el gerente bajando a la fábrica para decirle a cada máquina
+exactamente qué tornillo apretar.
+
+Es una API a través de la cual el núcleo del controlador interactúa con el
+entorno de la red. Ejemplos de esta interacción son por ejemplo la obtención de
+estadísticas y la modificación del comportamiento de los switches. Los dos
+protocolos que pueden realizar esta función son OpenFlow y P4.
+-->
+
 ### OpenFlow
 
 El protocolo OpenFlow opera entre un controlador SDN y un conmutador controlado
 por SDN u otro dispositivo que implemente la API OpenFlow. El protocolo OpenFlow
 funciona sobre TCP, siendo su número de puerto predeterminado el 6653.
+
+### P4
+
+P4 es un lenguaje de programacion diseñado especificamente para controlar planos
+de reenvío de paquetes en dispositivos de red, como routers y switches.
+
+La API P4Runtime es una especificación del plano de control para controlar los
+elementos del plano de datos de un dispositivo definido o descrito por un
+programa P4.
+
+### Tablas de flujos
+
+La Tabla de Flujos (Flow Table) es el componente fundamental dentro de un switch
+(como uno que soporte OpenFlow) que le dice exactamente qué hacer con cada
+paquete que llega.
+
+Si en una red tradicional el switch decide por su cuenta basándose en la
+dirección MAC o IP, en SDN el switch lo hace basandose en las reglas que el
+controlador ha instalado en estas tablas. En la tabla \ref{tab:ej-tabla-flujo}
+se muestra un ejemplo de tabla de flujo.
+
+\begin{table}[h]
+\centering\small
+\setlength{\arrayrulewidth}{0.5pt}
+\begin{tabularx}{\linewidth}
+    {|>{\centering\arraybackslash}p{55pt}|
+      >{\centering\arraybackslash}p{53pt}|
+      >{\centering\arraybackslash}p{30pt}|
+      >{\centering\arraybackslash}X|}
+  \hline
+  \textbf{Match}   & \textbf{Action} & \textbf{Priority} & \textbf{Counter} \\ \hline
+ ip\_src=10.*.*.*           & forward(eth1)   & 100               &                  \\ \hline
+ in\_port=eth0 & drop            & 100               &                  \\ \hline
+\end{tabularx}
+\caption{Ejemplo de tabla de flujo}
+\label{tab:ej-tabla-flujo}
+\end{table}
 
 ## Nivel de enlace
 
@@ -1676,10 +1830,12 @@ se podría decir que es un protocolo de la capa de enlace, pero también contien
 direcciones de la capa de red y, por tanto, podría también argumentarse que es
 un protocolo de la capa de red.
 
+<!--
 ### Comprobación de errores
 
 Quizá la forma más simple de detección de errores sea el uso de un único bit de
 paridad.
+-->
 
 ### Redes LAN
 
@@ -1708,6 +1864,13 @@ Una retransmisión (algoritmo de back-off) solo ocurre si se detecta una
 colisión. Si un receptor detecta algún error en la trama **no** se retransmite,
 si no que se descarta esa trama.
 
+Redes LAN como dominio de broadcast y red LAN de medio compartido son dos
+conceptos diferentes, el primero hace referencia a una misma red en la que tiene
+alcance una misma trama de broadcast, mientras que en la red de medio compartido
+se hacer referencias a las redes que acceden al mismo medio, por ejemplo
+mediante un Hub o porque están conectados mediante cable coaxial. La red LAN
+de medio compartido también se conoce como dominio de colisión.
+
 #### Ethernet 802.3
 
 Para transmitir en el protocolo Ethernet 802.3 half-duplex se siguen los
@@ -1731,7 +1894,8 @@ siguientes pasos:
    de colisiones y se transmite el resto de la trama.
 
 
-Si la red es full-duplex, el comportamiento cambia de forma fundamental respecto a Ethernet half-duplex.
+Si la red es full-duplex, el comportamiento cambia de forma fundamental respecto
+a Ethernet half-duplex.
 
 1. No existe CSMA/CD:
     En full-duplex:
@@ -1752,14 +1916,37 @@ Si la red es full-duplex, el comportamiento cambia de forma fundamental respecto
 
 En los switches modernos todas las interfaces trabajan en modo full-duplex.
 
+La longitud de la trama minima en Ethernet es de 64 bytes (o 512 bits) esto se
+impuso históricamente en medios con CSMA/CD para prevenir colisiones y aun
+hoy en día en redes modernas sin CSMA/CD se sigue utilizando para mantener
+compatibilidad con redes antiguas. La longitud de trama minima esta fijado para
+las longitud de redes y velocidades convencionales pero puede cambiar (siempre
+que se utilice CSMA/CD en half-duplex) para grandes extinciones de enlace. Lo
+que se debe asegurar es que el tiempo de transmisión de la trama $T_{trama}$
+debe ser mayor o igual al tiempo de ida y vuelta de propagación (RTT). Entonces
+la condición fija lo siguiente para un enlace de longitud $L$ y velocidad de
+propagación $v$.
+
+\vspace{-1em}
+$$T_{trama} \ge T_{RTT} = 2\cdot \frac{L}{v}
+\Rightarrow T_{trama} \ge 2\cdot \frac{L}{v}$$
+
+Si la trama tiene $N$ bits y el enlace tiene velocidad $R$ (en bits por
+segundo), entonces el tiempo de la trama en el cable resulta:
+
+\vspace{-1em}
+$$\text{si } T_{trama} = \frac{N}{R}\quad \Rightarrow N_{min} = \frac{NRL}{v}$$
+
 ### VLAN
 
 Las redes de area local virtuales (Virtual Local Area Network, VLAN) permiten
 usar la infraestructura existente para dar servicio a multiples redes (o
-dominios de broadcast). Se pueden implementan en uno o mas switches aunque
+dominios de broadcast). Se pueden implementar en uno o más switches aunque
 existen routers que también permiten implementarlas. Estas redes virtuales
 permiten crear redes aisladas utilizando la misma infraestructura e incluso los
-mismos enlaces.
+mismos enlaces. Las redes VLAN crean dominios de broadcast separados y si se
+desean interconectar dos redes VLAN diferentes se debe recurrir a dispositivos
+de nivel de red, routers, ya que es la única manera de conectar redes de acceso.
 
 Las redes VLAN se identifican entre switches (dispositivos de la capa de enlace)
 para esto utilizan un formato especifico de trama Ethernet. Los puertos entre
@@ -1770,7 +1957,7 @@ se comunican utilizando tramas Ethernet convencionales (sin un campo para VLAN).
 
 ### Spanning Tree Protocol
 
-Spanning Tree Protocol (STP) y la version mas moderna Rapid Spanning Tree
+Spanning Tree Protocol (STP) y la version más moderna Rapid Spanning Tree
 Protocol (RSTP) sirven para evitar enlaces redundantes en redes Ethernet 802.3.
 Si se detecta un ciclo extra entre switches se ejecuta un algoritmo que
 deshabilita ese enlace redundante. Los bridges o switches que ejecutan el
@@ -1784,19 +1971,19 @@ Protocol Data Unit (o BPDU). El BPDU siempre tiene dirección de destino
 * Reactivan enlaces alternativos si falla el principal.
 
 La diferencia principal entre ambas versiones es que la version RSTP converge
-mucho mas rápido a la topología sin bucles que STP, ya que es mas eficiente.
+mucho más rápido a la topología sin bucles que STP, ya que es más eficiente.
 
-El bridge identifier (BID) es un identificador de cada bridge (o switch) que se
-determina por la dirección MAC del bridge y un numero de prioridad (de 2 bytes)
-configurable.
+El **bridge identifier** (BID) es un identificador de cada bridge (o switch) que
+ocupa 8 bytes y se determina por la dirección MAC del bridge (6 bytes) y un
+numero de prioridad (2 bytes) configurable.
 
-El root bridge (o switch) es el switch con el menor BID (aquel con el valor mas
+El **root bridge** (o switch) es el switch con el menor BID (aquel con el valor más
 bajo) y puede haber solo un root bridge por dominio broadcast.
 
-El root path cost es el camino con menor costo desde un switch, o segmento de
-red, hasta el root bridge. Se calcula sumando el costo de cada enlace. Todos los
-switches y enlaces de red tienen un root path cost asociado, y por convención el
-del root bridge es cero.
+El **root path cost** es el camino con menor costo desde un switch, o segmento
+de red, hasta el root bridge. Se calcula sumando el costo de cada enlace. Todos
+los switches y enlaces de red tienen un root path cost asociado, y por
+convención el del root bridge es cero.
 
 #### Estados de los puertos
 
@@ -1814,7 +2001,8 @@ El algoritmo RSTP asigna a cada puerto un rol:
 * Root port (RP): es el puerto donde se enviarán y recibirán tramas en dirección
   al root bridge.
 * Designated port (DP): es el puerto que envía el mejor BPDU al segmento donde
-  esta conectado.
+  esta conectado, en otras palabras, es el puerto que tiene el mejor camino
+  hacia el Root Bridge dentro de ese segmento.
 * Alternate port (AP): provee un camino alternativo al provisto por el RP en
   dirección al root bridge.
 * Backup port  (BP): provee un camino alternativo al provisto por el DP en
@@ -1851,15 +2039,15 @@ inalámbricos se conecten a una red cableada o a otros dispositivos a través de
 él. Los clientes inalámbricos no se comunican directamente entre sí. Todo el
 tráfico pasa por el AP. El AP normalmente está conectado a un switch o router.
 
-```text
-Cliente 1
-    \
-     AP --- Switch --- Router --- Internet
-    /
-Cliente 2
-```
-
-Otros modos incluyen, bridge, repetidor, mesh y monitor.
+Otros modos incluyen, bridge, repetidor, mesh y monitor. En el modo **bridge**
+se interconectan redes cableadas mediante un enlace inalámbrico, y no se acepta
+la conexión de otros clientes inalámbricos (es una conexión punto a punto). En
+el modo **repetidor**, dos puntos de acceso se conectan de manera inalámbrica de
+manera tal de extender el rango del enlace inalámbrico, es decir, se retransmite
+la señal del AP original. El modo **mesh** es similar al modo repetidor pero se
+pueden interconectar más de un AP, y no se tiene un AP principal si no que las
+rutas entre diferentes APs inalámbricos es dinámica. Por ultimo en el modo
+**monitor** el AP solo escucha el trafico inalámbrico de la red.
 
 #### Sistema distribuido
 
@@ -1885,8 +2073,8 @@ portadora (Carrier Sense, CS), la función de coordinación distribuida
 (Acknowledgment Frames, ACK) y las peticiones de envió y recepción (Request to
 Send/Clear to Send, RTS/CTS).
 
-El **mecanismo de acceso múltiple por detección de portadora con evitación de
-colisiones** (Carrier Sense Multiple Access with Collision Avoidance,
+El mecanismo de **acceso múltiple por detección de portadora** con **evitación
+de colisiones** (Carrier Sense Multiple Access with Collision Avoidance,
 **CSMA/CA**) es un mecanismo que permite a un dispositivo inalámbrico verificar
 si el medio de transmisión esta libre antes de enviar datos. La principal
 diferencia con CSMA/CD utilizado en Ethernet 802.3 es que con CSMA/CA se
@@ -1916,13 +2104,107 @@ que no haya colisiones.
 En DCF cada estación que desee transmitir una trama debe esperar un intervalo
 especifico de tiempo antes de que el medio este disponible. Este intervalo de
 tiempo se conoce como espacio de inter-frame distribuido (Distributed
-Inter-Frame Space, **DIFS**). Luego de que termine el DIFS la estación debe
-competir por el medio.
+Inter-Frame Space, **DIFS**).
+
+\begin{table}[h]
+\centering\small
+\setlength{\arrayrulewidth}{0.5pt}
+\begin{tabularx}{\linewidth}
+    {|>{\centering\arraybackslash}p{75pt}|
+      >{\centering\arraybackslash}p{60pt}|
+      >{\centering\arraybackslash}X|}
+  \hline
+\textbf{Standard} & \textbf{Slot Time ($\mu$s)} & \textbf{DIFS ($\mu$s)} \\ \hline
+      802.11b           & 20        & 50       \\ \hline
+      802.11a           & 9         & 34       \\ \hline
+      802.11g           & 9 or 20   & 28 or 50 \\ \hline
+      802.11n (2.4 GHz) & 9 or 20   & 28 or 50 \\ \hline
+      802.11n (5 GHz)   & 9         & 34       \\ \hline
+      802.11ac          & 9         & 34       \\ \hline
+\end{tabularx}
+\caption{Valores de tiempo de slots y DIFS de acuerdo al estandar 802.11}
+\label{tab:ieee-80211-times}
+\end{table}
+
+Luego de que termine el DIFS todas las estaciones que deseen transmitir deben
+competir por el medio, para competir cada estación selecciona una cantidad de
+slots de tiempo aleatorio entre 0 y el valor de **la ventan de contención**
+(Contention Window, CW). El valor de la ventana de contención es dinámico, y
+cambia según el éxito o fracaso de las transmisiones. Se fijan dos limites para
+la ventana de contención el mínimo y el máximo, estos limites dependen del
+estándar, pero típicamente se fijan en 15 slots y 1033 slots, respectivamente.
+La ventana crece mediante un algoritmo denominado **retroceso exponencial
+binario** (Binary Exponential Backoff, BEB) en el cual si al terminar los slots
+de tiempo se transmite y no se recibe un ACK por parte del AP se duplica el
+valor de la ventana, se vuelven a elegir slots de tiempo aleatorios y se vuelve
+a retransmitir. Esto puede ocurrir por ejemplo si dos estaciones obtienen el
+mismo numero de slots, o si dos estaciones terminan sus slots al mismo tiempo.
+
+\begin{figure}[ht]
+\centering
+
+\begin{tikzpicture}[
+    box/.style={draw, very thick, minimum height=0.6cm, minimum width=0.65cm},
+    sifs/.style={draw, very thick, minimum height=0.6cm, minimum width=1.20cm},
+    pifs/.style={draw, very thick, minimum height=0.6cm, minimum width=1.85cm},
+    difs/.style={draw, very thick, minimum height=0.6cm, minimum width=2.50cm}
+]
+
+% Parámetros de separación
+\def\hsep{0.3}
+\def\vsep{1.0}
+
+% --- Slot Time ---
+\node[box, anchor=west] (slot) at (0,0) {};
+\node at (2.0,0) (slottxt) {\textbf{Slot}};
+\draw[->, very thick] (slottxt.west) -- ($(slot.east)+(0.20,0)$);
+
+% --- SIFS ---
+\node[sifs, anchor=west] at (0,-\vsep) {\textbf{SIFS}};
+
+% --- SIFS + Slot = PIFS ---
+\node[sifs, anchor=west] (sifs2) at (0,-2*\vsep) {\textbf{SIFS}};
+\node at ($(sifs2.east)+(\hsep,0)$) {\Large\textbf{+}};
+\node[box] at ($(sifs2.east)+(0.9,0)$) {};
+\node at ($(sifs2.east)+(1.5,0)$) {\Large\textbf{=}};
+\node[pifs] at ($(sifs2.east)+(3.0,0)$) {\textbf{PIFS}};
+
+% --- SIFS + 2 Slots = DIFS ---
+\node[sifs, anchor=west] (sifs3) at (0,-3*\vsep) {\textbf{SIFS}};
+\node at ($(sifs3.east)+(\hsep,0)$) {\Large\textbf{+}};
+\node[box] at ($(sifs3.east)+(0.9,0)$) {};
+\node at ($(sifs3.east)+(1.5,0)$) {\Large\textbf{+}};
+\node[box] at ($(sifs3.east)+(2.1,0)$) {};
+\node at ($(sifs3.east)+(2.7,0)$) {\Large\textbf{=}};
+\node[difs] at ($(sifs3.east)+(4.2,0)$) {\textbf{DIFS}};
+
+\end{tikzpicture}
+
+\caption{Relacion entre slots de tiempo}
+\label{fig:fig-slots}
+\end{figure}
+
 
 ##### RTS/CTS
 
 Según el estándar no es obligatorio implementarlo en el AP, pero en ciertos
 casos, como en el problema del nodo oculto, resulta útil para evitar colisiones.
+
+Básicamente el procedimiento sigue siendo el mismo hasta llegado el momento de
+transmitir los datos, es decir, luego de censar el medio esta libre, habiendo
+esperado un DIFS y consumido los slots; en este punto teniendo este mecanismo
+habilitado se debe enviar una pequeña trama de control al AP
+
+##### PCF
+
+La **función de coordinación de punto** (Point Coordination Function, **PCF**)
+es un modo libre de contienda, esto es, las estaciones no compiten por el medio
+para transmitir, si no que es el AP quien decide quien transmite y quien no,
+esto lo hace mediante la interrogación periódica (Polling) a todos los
+dispositivos de la red por si deseen trasmitir.
+
+En este modo no hay colisiones ya que el AP interroga uno por uno a las
+estaciones de la red.
 
 ##### Fragmentación
 
@@ -1934,4 +2216,138 @@ propia, lo que implica una carga adicional de bytes. También entre fragmentos s
 debe esperar un SIFS y un ACK, por lo que también se agrega tiempo muerto que no
 se puede usar para transmitir datos útiles.
 
-<!-- ## Nivel físico -->
+Cuando se desea enviar una trama MAC 802.11 fragmentada, solo el primer
+fragmento debe competir por el medio, una vez que se tiene acceso al medio los
+datos se envían en ráfagas de segmentos uno atrás de otros, solamente separados
+por segmentos de validación y los respectivos intervalos de tiempo SIFS.
+
+La fragmentación solo se aplica a tramas unicast, las tramas broadcast o
+multicast no se fragmentan.
+
+## Nivel físico
+
+### Modulación
+
+La modulación es la modificación de uno o varios parámetros de la señal
+portadora, esta señal portadora (o también llamada Carrier) típicamente es una
+señal periódica, sinusoidal, que se utiliza como base sobre la cual se modula
+información mediante la variación controlada de alguno de sus parámetros
+(amplitud, frecuencia o fase). La señal portadora permite que la señal
+resultante sea adecuada para propagarse eficientemente en el medio, y la
+elección de la frecuencia no es arbitraria si no que depende del medio, alcance
+deseado, capacidad de penetración y regulaciones del espectro.
+
+Algunos ejemplos de modulación incluyen modulación en amplitud (AM), modulación
+en frecuencia (FM), modulación digital de amplitud (ASK), fase (PSK) y
+frecuencia (FSK), modulación de amplitud en cuadratura (QAM), entre otros.
+
+### Multiplexación
+
+La multiplexación se utiliza para compartir un enlace que no esta siendo
+utilizado en su totalidad para aumentar su eficiencia.
+
+### Teoremas de Nyquist y Shannon
+
+El teorema de Nyquist establece el límite máximo de tasa de transmisión en un
+canal sin ruido y con ancho de banda limitado. Para un canal sin ruido con ancho
+de banda B (en Hz) se define como la maxima tasa de símbolos (en Baud) como:
+
+\vspace{-1em}
+$$C \le 2B$$
+\vspace{-1em}
+
+Y ademas si cada símbolo puede representar M niveles (o símbolos) distintos,
+entonces la velocidad de transmisión en bits resulta:
+
+\vspace{-1em}
+$$C = 2\ B\ log_{2}\left(M \right)$$
+\vspace{-1em}
+
+Por ejemplo para un modem telefónico con ancho de banda 4 KHz la velocidad de
+transmisión maxima (para niveles lógicos 0 y 1) resulta:
+
+\vspace{-1em}
+$$C = 2\cdot 4KHz\ log_{2}\left(2 \right) = 8 Kbps$$
+\vspace{-1em}
+
+Mientras que para 32 niveles resulta:
+
+\vspace{-1em}
+$$C = 2\cdot 4KHz\ log_{2}\left(32 \right) = 8 Kbps$$
+\vspace{-1em}
+
+El teorema de Shannon amplía el teorema de Nyquist a canales con ruido, y dice
+que la capacidad máxima (C) de un canal depende de su ancho de banda (B) y de
+cuanto influye el ruido en la señal (Signal to Noise Ratio, SNR; en veces, no en
+dB). Es la capacidad máxima para el receptor, luego de pasar por el canal con
+ruido.
+
+\vspace{-1em}
+$$C=B\ log_{2}(1+SNR) = B\ log_{2}\left(1+\frac{S}{R}\right)$$
+\vspace{-1em}
+
+### Ruido térmico
+
+El ruido térmico (también llamado ruido Johnson-Nyquist) es el ruido eléctrico
+generado por la agitación térmica de los electrones en cualquier conductor o
+dispositivo físico que tenga una temperatura mayor que 0 K. Es un fenómeno
+fundamental, inevitable y presente en todos los sistemas electrónicos.
+
+La potencia de ruido medida en Watts ($W$) en un ancho de banda ($B$) es:
+
+\vspace{-1em}
+$$N = kTB$$
+\vspace{-1em}
+
+Donde $k$ es la constante de Boltzmann $1.38*10^{-23}\nicefrac{J}{K}$, $T$
+la temperatura absoluta en Kelvin.
+
+### Diagrama de constelación
+
+Un diagrama de constelación (o también llamado diagrama de símbolos) es una
+representación gráfica que muestra los símbolos posibles de una señal digital
+modulada en un plano complejo. En el eje horizontal se representa la componente
+I (In-phase) y en el vertical la componente Q (Quadrature).
+
+La distancia al origen representa la amplitud. El ángulo con respecto al eje
+real representa la fase. Cada símbolo corresponde a una combinación específica
+de I y Q.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.60\columnwidth]{img/diagrama_constelacion_8PSK_gray.png}
+  \caption{Diagrama de constelación}
+  \label{fig:ej-diagrama-de-constelacion}
+\end{figure}
+
+
+### Decibeles
+
+Para potencia se toma
+
+\vspace{-1em}
+$$G_{dB} = 10 * log\left(\frac{P_{out}}{P_{in}}\right);\qquad
+\frac{P_{out}}{P_{in}} = 10^{\textstyle \frac{G_{dB}}{10}}$$
+
+Para tensión, corriente, campo eléctrico, etc:
+
+\vspace{-1em}
+$$G_{dB} = 20 * log\left(\frac{V_{out}}{V_{in}}\right);\qquad
+\frac{V_{out}}{V_{in}} = 10^{\textstyle \frac{G_{dB}}{20}}$$
+
+Al medir una potencia en decibeles, se debe adoptar una referencia de potencia
+para indicar respecto de qué potencia se mide. Para expresarlo se le agrega una
+letra a las unidades dB.
+
+Si la potencia de referencia es 1W se emplea el dBw:
+
+\vspace{-1em}
+$$G_{\text{dBW}} = 10 \cdot \log \left( \frac{P}{1\text{ W}} \right); \qquad
+\frac{P}{1\text{ W}} = 10^{\textstyle \frac{G_{\text{dBW}}}{10}}$$
+
+Si la referencia es 1 mW la unidad es el dBm:
+
+\vspace{-1em}
+$$G_{\text{dBm}} = 10 \cdot \log \left( \frac{P}{1\text{ mW}} \right); \qquad 
+\frac{P}{1\text{ mW}} = 10^{\textstyle \frac{G_{\text{dBm}}}{10}}$$
+
