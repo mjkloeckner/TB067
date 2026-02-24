@@ -1,7 +1,6 @@
 # Resumen
 
 Redes de Comunicaciones (TB067) - FIUBA  
-Martin Klöckner - [mklockner@fi.uba.ar](mailto:mklockner@fi.uba.ar)
 
 ## Introducción
 
